@@ -50,7 +50,7 @@ MAVEN_URL="http://s3.amazonaws.com/heroku-jvm-langpack-java/maven-3.0.5.tar.gz"
 
 rm -rf .maven
 if [ ! -d .maven ]; then
-  echo -n "-----> Installing Maven 3.0.3..."
+  echo -n "-----> Installing Maven 3.0.5..."
   curl --silent --max-time 60 --location $MAVEN_URL | tar xz
   chmod +x .maven/bin/mvn
   echo " done"
