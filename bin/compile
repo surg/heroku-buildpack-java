@@ -46,15 +46,33 @@ echo " done"
 cd $CACHE_DIR
 
 # install maven with base repository
-MAVEN_URL="http://s3.amazonaws.com/heroku-jvm-langpack-java/maven-3.0.5.tar.gz"
+#MAVEN_URL="http://s3.amazonaws.com/heroku-jvm-langpack-java/maven-3.0.5.tar.gz"
+MAVEN_URL="http://apache-mirror.telesys.org.ua/maven/maven-3/3.1.1/binaries/apache-maven-3.1.1-bin.tar.gz"
 
 rm -rf .maven
 if [ ! -d .maven ]; then
-  echo -n "-----> Installing Maven 3.0.5..."
+  echo -n "-----> Installing Maven 3.1.1..."
   curl --silent --max-time 60 --location $MAVEN_URL | tar xz
+  mv apache-maven-3.1.1 .maven
   chmod +x .maven/bin/mvn
   echo " done"
 fi
+
+ZINC_URL="http://downloads.typesafe.com/zinc/0.3.0/zinc-0.3.0.tgz"
+
+if [ ! -d .zinc ]; then
+  echo -n "-----> Installing Zinc..."
+  curl --silent --max-time 60 --location $ZINC_URL | tar xz
+  mv zinc-0.3.0 .zinc
+  mkdir -p .zinc/cache
+  chmod +x .zinc/bin/zinc
+  echo " done"
+fi
+
+ZINC_START_CMD="$CACHE_DIR/.zinc/bin/zinc -d $CACHE_DIR/.zinc/cache -start"
+ZINC_SHUTDOWN_CMD="$CACHE_DIR/.zinc/bin/zinc -shutodwn"
+
+$ZINC_START_CMD
 
 MAVEN_SETTINGS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-java/settings.xml"
 
@@ -81,14 +99,16 @@ if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   exit 1
 fi
 
+$ZINC_SHUTDOWN_CMD
+
 # finalize cache
 if [ "false" == $KEEP_M2_CACHE ]; then
   touch $CACHE_DIR/removeM2Cache
 fi
 
-#copy .m2 and .maven if needed
+#copy .m2, .maven and .zinc if needed
 if [ "true" == $KEEP_M2_CACHE ]; then
-  for DIR in ".m2" ".maven" ; do
+  for DIR in ".m2" ".maven" ".zinc" ; do
     cp -r $CACHE_DIR/$DIR $DIR
   done
 fi
