@@ -72,7 +72,7 @@ fi
 ZINC_START_CMD="$CACHE_DIR/.zinc/bin/zinc -d $CACHE_DIR/.zinc/cache -start"
 ZINC_SHUTDOWN_CMD="$CACHE_DIR/.zinc/bin/zinc -shutdown"
 
-#$ZINC_START_CMD
+$ZINC_START_CMD
 
 MAVEN_SETTINGS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-java/settings.xml"
 
@@ -99,7 +99,7 @@ if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   exit 1
 fi
 
-#$ZINC_SHUTDOWN_CMD
+$ZINC_SHUTDOWN_CMD
 
 # finalize cache
 if [ "false" == $KEEP_M2_CACHE ]; then
