@@ -2,7 +2,7 @@ Heroku buildpack: Java
 =========================
 
 This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpack) for Java apps.
-It uses Maven 3.0.3 to build your application and OpenJDK 1.6.0_20 to run it.
+It uses Maven 3.1.1 to build your application and OpenJDK 1.6.0_20 to run it.
 
 Usage
 -----
