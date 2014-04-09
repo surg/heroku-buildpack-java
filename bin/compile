@@ -80,6 +80,12 @@ echo -n "-----> Installing settings.xml..."
 if [ -f .m2/settings.xml ]; then
   rm .m2/settings.xml 
 fi
+
+if [ ! -d .m2 ]; then 
+  echo -n "Making dir .m2... "
+  mkdir .m2
+fi 
+
 curl --silent --max-time 10 --location $MAVEN_SETTINGS_URL --output .m2/settings.xml
 echo " done"
 
