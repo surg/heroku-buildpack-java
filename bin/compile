@@ -53,7 +53,7 @@ rm -rf .maven
 if [ ! -d .maven ]; then
   echo -n "-----> Installing Maven 3.2.1..."
   curl --max-time 60 --location $MAVEN_URL | tar xz
-  mv apache-maven-3.1.1 .maven
+  mv apache-maven-3.2.1 .maven
   chmod +x .maven/bin/mvn
   echo " done"
 fi
