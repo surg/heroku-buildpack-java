@@ -63,7 +63,6 @@ cd $CACHE_DIR
 # install maven with base repository
 MAVEN_URL="http://www.us.apache.org/dist/maven/maven-3/3.2.1/binaries/apache-maven-3.2.1-bin.tar.gz"
 
-rm -rf .maven
 if [ ! -d .maven ]; then
   echo -n "-----> Installing Maven 3.2.1..."
   curl --max-time 60 --location $MAVEN_URL | tar xz
