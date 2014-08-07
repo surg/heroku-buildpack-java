@@ -35,6 +35,21 @@ if [ ! -f ${BUILD_DIR}/system.properties ]; then
   echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
 fi
 
+###Start Install NodeJs
+
+# Download node from Heroku's S3 mirror of nodejs.org/dist
+node_url="http://s3pository.heroku.com/node/v0.10.25/node-v0.10.25-linux-x64.tar.gz"
+curl $node_url -s -o - | tar xzf - -C $BUILD_DIR
+
+# Move node (and npm) into ./vendor and make them executable
+mkdir -p $BUILD_DIR/vendor
+echo -n "-----> Installing Node v0.10.25..."
+mv $BUILD_DIR/node-v0.10.25-linux-x64 $BUILD_DIR/vendor/node
+chmod +x $BUILD_DIR/vendor/node/bin/*
+export PATH="$BUILD_DIR/vendor/node/bin:$PATH"
+
+### Finish Install NodeJs
+
 # install JDK 
 javaVersion=$(detect_java_version ${BUILD_DIR})
 echo -n "-----> Installing OpenJDK ${javaVersion}..."
@@ -46,7 +61,6 @@ echo " done"
 cd $CACHE_DIR
 
 # install maven with base repository
-#MAVEN_URL="http://s3.amazonaws.com/heroku-jvm-langpack-java/maven-3.0.5.tar.gz"
 MAVEN_URL="http://www.us.apache.org/dist/maven/maven-3/3.2.1/binaries/apache-maven-3.2.1-bin.tar.gz"
 
 rm -rf .maven
