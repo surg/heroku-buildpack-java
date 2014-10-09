@@ -118,7 +118,7 @@ SRC_URL="postgres://sample1234User:sample1234Password@ec2-54-235-133-141.compute
 DB_URL_PARTS=( $(echo $DB_URL | sed 's/postgres:\/\/\([[:alnum:]]\+\):\([[:alnum:]]\+\)@\([^:/]\+:[[:digit:]]\+\/[[:alnum:]]\+\).*/\1 \2 \3/') )
 DB_USER=${DB_URL_PARTS[0]}
 DB_PWD=${DB_URL_PARTS[1]}
-DB_JDBC_URL=jdbc:postgresql://${RES[2]}
+DB_JDBC_URL=jdbc:postgresql://${DB_URL_PARTS[2]}
 echo JDBC URL=$DB_JDBC_URL
 
 $CACHE_DIR/.maven/bin/mvn liquibase:updateSQL --non-recursive -Dliquibase.url=$DB_JDBC_URL -Dliquibase.username=$DB_USER -Dliquibase.password=$DB_PWD -B -Duser.home=$BUILD_DIR -Dmaven.repo.local=$CACHE_DIR/.m2/repository -s $CACHE_DIR/.m2/settings.xml
