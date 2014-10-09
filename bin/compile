@@ -113,20 +113,18 @@ export MAVEN_OPTS="-Xmx1024m"
 echo "------> checking if DB is up to date"
 DB_URL=$(cat $ENV_DIR/DATABASE_URL)
 
-
-SRC_URL="postgres://sample1234User:sample1234Password@ec2-54-235-133-141.compute-1.amazonaws.com:5512/d5sam770v1uent"
 DB_URL_PARTS=( $(echo $DB_URL | sed 's/postgres:\/\/\([[:alnum:]]\+\):\([[:alnum:]]\+\)@\([^:/]\+:[[:digit:]]\+\/[[:alnum:]]\+\).*/\1 \2 \3/') )
 DB_USER=${DB_URL_PARTS[0]}
 DB_PWD=${DB_URL_PARTS[1]}
 DB_JDBC_URL=jdbc:postgresql://${DB_URL_PARTS[2]}
 echo JDBC URL=$DB_JDBC_URL
 
-$CACHE_DIR/.maven/bin/mvn liquibase:updateSQL -f payments/pom.xml -Dliquibase.url=$DB_JDBC_URL -Dliquibase.username=$DB_USER -Dliquibase.password=$DB_PWD -B -Duser.home=$BUILD_DIR -Dmaven.repo.local=$CACHE_DIR/.m2/repository -s $CACHE_DIR/.m2/settings.xml
+$CACHE_DIR/.maven/bin/mvn liquibase:updateSQL -f db/pom.xml -Dliquibase.url=$DB_JDBC_URL -Dliquibase.username=$DB_USER -Dliquibase.password=$DB_PWD -B -Duser.home=$BUILD_DIR -Dmaven.repo.local=$CACHE_DIR/.m2/repository -s $CACHE_DIR/.m2/settings.xml
 
 echo "------> listing dirs:"
 ls $BUILD_DIR
 
-UPDATE_SQL_FILE=$BUILD_DIR/payments/target/liquibase/migrate.sql
+UPDATE_SQL_FILE=$BUILD_DIR/db/target/liquibase/migrate.sql
 if grep -m 1 -q ^\\s\*\\w\\+ "$UPDATE_SQL_FILE"; then
     echo "-------> Need to update DB - aborting deploy"
     exit 1
@@ -136,6 +134,7 @@ elif [ ! -f $UPDATE_SQL_FILE ]; then
 else
     echo "------> DB is up to date, OK to depoy"
 fi
+
 
 # build app
 BUILDCMD="$CACHE_DIR/.maven/bin/mvn -B -Duser.home=$BUILD_DIR -Dmaven.repo.local=$CACHE_DIR/.m2/repository -s $CACHE_DIR/.m2/settings.xml -Dmaven.test.skip=true clean install"
