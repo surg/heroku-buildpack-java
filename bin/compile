@@ -110,30 +110,32 @@ export MAVEN_OPTS="-Xmx1024m"
 
 
 # check if DB is up to date
-echo "------> checking if DB is up to date"
-DB_URL=$(cat $ENV_DIR/DATABASE_URL)
+if [ -f $ENV_DIR/DATABASE_URL ]; then # This buildback can be used for apps without database (e.g. clerk)
+    echo "------> checking if DB is up to date"
+    DB_URL=$(cat $ENV_DIR/DATABASE_URL)
 
-DB_URL_PARTS=( $(echo $DB_URL | sed 's/postgres:\/\/\([[:alnum:]]\+\):\([[:alnum:]]\+\)@\([^:/]\+:[[:digit:]]\+\/[[:alnum:]]\+\).*/\1 \2 \3/') )
-DB_USER=${DB_URL_PARTS[0]}
-DB_PWD=${DB_URL_PARTS[1]}
-DB_JDBC_URL=jdbc:postgresql://${DB_URL_PARTS[2]}
-echo JDBC URL=$DB_JDBC_URL
+    DB_URL_PARTS=( $(echo $DB_URL | sed 's/postgres:\/\/\([[:alnum:]]\+\):\([[:alnum:]]\+\)@\([^:/]\+:[[:digit:]]\+\/[[:alnum:]]\+\).*/\1 \2 \3/') )
+    DB_USER=${DB_URL_PARTS[0]}
+    DB_PWD=${DB_URL_PARTS[1]}
+    DB_JDBC_URL=jdbc:postgresql://${DB_URL_PARTS[2]}
+    echo JDBC URL=$DB_JDBC_URL
 
-$CACHE_DIR/.maven/bin/mvn liquibase:updateSQL -f db/pom.xml -Dliquibase.url=$DB_JDBC_URL -Dliquibase.username=$DB_USER -Dliquibase.password=$DB_PWD -B -Duser.home=$BUILD_DIR -Dmaven.repo.local=$CACHE_DIR/.m2/repository -s $CACHE_DIR/.m2/settings.xml
+    $CACHE_DIR/.maven/bin/mvn liquibase:updateSQL -f db/pom.xml -Dliquibase.url=$DB_JDBC_URL -Dliquibase.username=$DB_USER -Dliquibase.password=$DB_PWD -B -Duser.home=$BUILD_DIR -Dmaven.repo.local=$CACHE_DIR/.m2/repository -s $CACHE_DIR/.m2/settings.xml
 
-echo "------> listing dirs:"
-ls $BUILD_DIR
+    echo "------> listing dirs:"
+    ls $BUILD_DIR
 
-UPDATE_SQL_FILE=$BUILD_DIR/db/target/liquibase/migrate.sql
-if grep -m 1 -q ^\\s\*\\w\\+ "$UPDATE_SQL_FILE"; then
-    echo "-------> DB misses following updates - aborting deploy:"
-    cat $UPDATE_SQL_FILE
-    exit 1
-elif [ ! -f $UPDATE_SQL_FILE ]; then
-    echo "-------> Buildpack is broken - can't check if DB needs update. Aborting deploy."
-    exit 1
-else
-    echo "------> DB is up to date, OK to depoy"
+    UPDATE_SQL_FILE=$BUILD_DIR/db/target/liquibase/migrate.sql
+    if grep -m 1 -q ^\\s\*\\w\\+ "$UPDATE_SQL_FILE"; then
+        echo "-------> DB misses following updates - aborting deploy:"
+        cat $UPDATE_SQL_FILE
+        exit 1
+    elif [ ! -f $UPDATE_SQL_FILE ]; then
+        echo "-------> Buildpack is broken - can't check if DB needs update. Aborting deploy."
+        exit 1
+    else
+        echo "------> DB is up to date, OK to depoy"
+    fi
 fi
 
 
