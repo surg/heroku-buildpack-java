@@ -110,7 +110,7 @@ export MAVEN_OPTS="-Xmx1024m"
 
 
 # check if DB is up to date
-if [ -f $ENV_DIR/DATABASE_URL ]; then # This buildback can be used for apps without database (e.g. clerk)
+if [ -f $ENV_DIR/DATABASE_URL ] && [ -f db/pom.xml ]; then # This buildback can be used for apps other then LPA (e.g. clerk)
     echo "------> checking if DB is up to date"
     DB_URL=$(cat $ENV_DIR/DATABASE_URL)
 
